@@ -170,7 +170,7 @@ def build_config(env: dict | None = None) -> dict:
             account["proxy"] = proxy_url
         if ch == "telegram":
             account["groupPolicy"] = (
-                "mentions" if _telegram_config.get("requireMention") else "open"
+                "allowlist" if _telegram_config.get("requireMention") else "open"
             )
         if ch in _allowed_ids and _allowed_ids[ch]:
             account["dmPolicy"] = "allowlist"

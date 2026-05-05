@@ -158,6 +158,34 @@ describe("generate-openclaw-config.py: config generation", () => {
     expect(config.channels.telegram).toBeDefined();
   });
 
+  it("sets Telegram groupPolicy to 'allowlist' when requireMention is true (#3022)", () => {
+    const channels = Buffer.from(JSON.stringify(["telegram"])).toString("base64");
+    const telegramConfig = Buffer.from(JSON.stringify({ requireMention: true })).toString("base64");
+    const config = runConfigScript({
+      NEMOCLAW_MESSAGING_CHANNELS_B64: channels,
+      NEMOCLAW_TELEGRAM_CONFIG_B64: telegramConfig,
+    });
+    expect(config.channels.telegram.accounts.default.groupPolicy).toBe("allowlist");
+  });
+
+  it("sets Telegram groupPolicy to 'open' when requireMention is false (#3022)", () => {
+    const channels = Buffer.from(JSON.stringify(["telegram"])).toString("base64");
+    const telegramConfig = Buffer.from(JSON.stringify({ requireMention: false })).toString("base64");
+    const config = runConfigScript({
+      NEMOCLAW_MESSAGING_CHANNELS_B64: channels,
+      NEMOCLAW_TELEGRAM_CONFIG_B64: telegramConfig,
+    });
+    expect(config.channels.telegram.accounts.default.groupPolicy).toBe("open");
+  });
+
+  it("defaults Telegram groupPolicy to 'open' when telegramConfig is empty (#3022)", () => {
+    const channels = Buffer.from(JSON.stringify(["telegram"])).toString("base64");
+    const config = runConfigScript({
+      NEMOCLAW_MESSAGING_CHANNELS_B64: channels,
+    });
+    expect(config.channels.telegram.accounts.default.groupPolicy).toBe("open");
+  });
+
   it("emits canonical openshell:resolve:env: placeholders for non-Slack channels", () => {
     const channels = Buffer.from(JSON.stringify(["telegram", "discord"])).toString("base64");
     const config = runConfigScript({ NEMOCLAW_MESSAGING_CHANNELS_B64: channels });
